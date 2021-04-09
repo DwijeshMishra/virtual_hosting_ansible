@@ -1,0 +1,42 @@
+---
+- name: Mariadb setup
+  hosts: dbserver
+  vars:
+   db_pkg: 
+    - mariadb-server
+    - python3-PyMySQL
+   user_password: 1234  
+   root_password: redhat
+
+  tasks:
+   - name: Install {{ db_pkg }}
+     yum:
+      name: "{{ db_pkg }}"
+      state: present
+
+   - name: start mariadb service
+     service:
+      name: mariadb
+      state: started
+      enabled: true
+
+   - name: mysql_root_password
+     mysql_user:
+      login_user: root
+      login_password: "{{ root_password }}"
+      user: root
+      check_implicit_admin: true
+      password: "{{ root_password }}"
+      host: localhost
+
+   - name: Create database user with name 'bob' and password '12345' with all database privileges
+     mysql_user:
+      login_user: root
+      login_password: "{{ root_password }}"
+      name: bob
+      password: "{{ user_password }}"
+      priv: '*.*:ALL'
+      state: present
+       
+ 
+
