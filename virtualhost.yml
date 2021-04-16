@@ -1,0 +1,5 @@
+---
+- name: role for virtual hosting
+  hosts: test
+  roles:
+    - virtualhost      
