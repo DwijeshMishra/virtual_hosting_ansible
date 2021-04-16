@@ -1,0 +1,15 @@
+---
+# vars file for virtualhost
+httpd_pkg:
+ - httpd
+
+web_service:
+ - httpd
+
+website_dir:
+ - site1/public_html
+ - site2/public_html
+
+conf_dir:
+ - sites-available
+ - sites-enabled   

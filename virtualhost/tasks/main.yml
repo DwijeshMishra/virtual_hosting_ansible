@@ -1,0 +1,64 @@
+---
+# tasks file for virtualhost
+- name: Install {{ httpd_pkg }}
+  yum:
+   name: "{{ httpd_pkg }}"
+   state: present
+
+- name: Start service {{ web_service }}
+  service: 
+   name: httpd
+   state: started
+   enabled: true
+
+- name: Create directory {{ website_dir }}
+  file:
+   path: /var/www/{{ item }}
+   state: directory
+  loop: "{{ website_dir }}"
+
+- name: Create directory {{ website_dir }}
+  copy:
+   content: "site 1 and 2" 
+   dest: /var/www/{{ item }}/index.html  
+  loop: "{{ website_dir }}"
+
+- name: Create conf {{ conf_dir }}
+  file:
+   path: /etc/httpd/{{ item }}
+   state: directory
+  loop: "{{ conf_dir }}"
+
+- name: Ensure we have properly include site-enabled
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^IncludeOptional conf.d/*.conf'
+    insertafter: '^IncludeOptional conf.d/*.conf'
+    line: 'IncludeOptional sites-enabled/*.conf'  
+
+- name: Copy the jinja2 file to create virtual host conf in site-available  
+  template:
+   src: templates/virtual.j2  
+   dest: /etc/httpd/sites-available/site1.conf 
+  notify: restart service 
+
+- name: Copy the jinja2 file to create virtual host conf in site-available
+  template:
+   src: templates/virtual2.j2 
+   dest: /etc/httpd/sites-available/site2.conf
+  notify: restart service
+ 
+- name: create link for site1 enabled  
+  file: 
+   path: /etc/httpd/sites-available/site1.conf
+   src: /etc/httpd/sites-enabled/site1.conf
+   state: link 
+   force: yes
+
+- name: create link for site2 enabled
+  file: 
+   path: /etc/httpd/sites-available/site1.conf
+   src: /etc/httpd/sites-enabled/site1.conf
+   state: link      
+   force: yes 
+
